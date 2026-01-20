@@ -1,0 +1,82 @@
+#include <IRremote.h>
+
+char command;
+int receiver_pin = 4; // Connect the output pin of IR receiver at pin 4
+IRrecv irrecv(receiver_pin);
+decode_results results;
+
+// connect motor controller pins to Arduino digital pins
+int in1 = 5;
+int in2 = 6;
+int in3 = 10;
+int in4 = 11;
+
+void setup()
+{
+  Serial.begin(9600);
+  irrecv.enableIRIn();
+
+  // set all the motor control pins to outputs
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+}
+
+void loop()
+{
+  if (irrecv.decode(&results))
+  {
+    irrecv.resume();
+
+    if (results.value == 0xFF18E7) // button 2: forward
+    {
+      digitalWrite(in1, 1);
+      digitalWrite(in2, 0);
+      digitalWrite(in3, 1);
+      digitalWrite(in4, 0);
+    }
+    else if (results.value == 0xFF10EF) // button 4: turn left
+    {
+      digitalWrite(in1, 1);
+      digitalWrite(in2, 0);
+      digitalWrite(in3, 0);
+      digitalWrite(in4, 0);
+    }
+    else if (results.value == 0xFF30CF) // button 1: rotate left
+    {
+      digitalWrite(in1, 1);
+      digitalWrite(in2, 0);
+      digitalWrite(in3, 0);
+      digitalWrite(in4, 1);
+    }
+    else if (results.value == 0xFF5AA5) // button 6: turn right
+    {
+      digitalWrite(in1, 0);
+      digitalWrite(in2, 0);
+      digitalWrite(in3, 1);
+      digitalWrite(in4, 0);
+    }
+    else if (results.value == 0xFF7A85) // button 3: rotate right
+    {
+      digitalWrite(in1, 0);
+      digitalWrite(in2, 1);
+      digitalWrite(in3, 1);
+      digitalWrite(in4, 0);
+    }
+    else if (results.value == 0xFF4AB5) // button 8: backward
+    {
+      digitalWrite(in1, 0);
+      digitalWrite(in2, 1);
+      digitalWrite(in3, 0);
+      digitalWrite(in4, 1);
+    }
+    else if (results.value == 0xFF38C7) // button 5: stop
+    {
+      digitalWrite(in1, 0);
+      digitalWrite(in2, 0);
+      digitalWrite(in3, 0);
+      digitalWrite(in4, 0);
+    }
+  }
+}

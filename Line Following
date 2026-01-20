@@ -1,0 +1,118 @@
+int in1 = 5;
+int in2 = 6;
+int in3 = 10;
+int in4 = 11;
+
+int left = 13;
+int right = 12;
+
+int Left = 0;
+int Right = 0;
+
+void LEFT (void);
+void RIGHT (void);
+void STOP (void);
+
+void setup()
+{
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+
+  pinMode(left, INPUT);
+  pinMode(right, INPUT);
+
+  digitalWrite(left, HIGH);
+  digitalWrite(right, HIGH);
+
+  analogWrite(in1, 255);
+  analogWrite(in2, 0);
+  analogWrite(in3, 255);
+  analogWrite(in4, 0);
+}
+
+void loop()
+{
+  Left = digitalRead(left);
+  Right = digitalRead(right);
+
+  if (Left == 0 && Right == 1)
+  {
+    LEFT();
+  }
+  else if (Right == 0 && Left == 1)
+  {
+    RIGHT();
+  }
+}
+
+void LEFT (void)
+{
+  analogWrite(in3, 0);
+  analogWrite(in4, 30);
+
+  while (Left == 0)
+  {
+    Left = digitalRead(left);
+    Right = digitalRead(right);
+
+    if (Right == 0)
+    {
+      int lprev = Left;
+      int rprev = Right;
+      STOP();
+
+      while (((lprev == Left) && (rprev == Right)) == 1)
+      {
+        Left = digitalRead(left);
+        Right = digitalRead(right);
+      }
+    }
+
+    analogWrite(in1, 255);
+    analogWrite(in2, 0);
+  }
+
+  analogWrite(in3, 255);
+  analogWrite(in4, 0);
+}
+
+void RIGHT (void)
+{
+  analogWrite(in1, 0);
+  analogWrite(in2, 30);
+
+  while (Right == 0)
+  {
+    Left = digitalRead(left);
+    Right = digitalRead(right);
+
+    if (Left == 0)
+    {
+      int lprev = Left;
+      int rprev = Right;
+      STOP();
+
+      while (((lprev == Left) && (rprev == Right)) == 1)
+      {
+        Left = digitalRead(left);
+        Right = digitalRead(right);
+      }
+    }
+
+    analogWrite(in3, 255);
+    analogWrite(in4, 0);
+  }
+
+  analogWrite(in1, 255);
+  analogWrite(in2, 0);
+}
+
+void STOP (void)
+{
+  analogWrite(in1, 0);
+  analogWrite(in2, 0);
+  analogWrite(in3, 0);
+  analogWrite(in4, 0);
+}

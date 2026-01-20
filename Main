@@ -1,0 +1,59 @@
+int in1 = 5;
+int in2 = 6;
+int in3 = 9;
+int in4 = 10;
+int state; //
+
+void setup() {
+  Serial.begin(9600); // bluetooth communication
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+}
+
+void loop() {
+  if (Serial.available() > 0) { // when bluetooth command is available
+    state = Serial.read();
+  }
+
+  if (state == 'F') { // Forward
+    Serial.println(state);
+    digitalWrite(in4, 0);
+    digitalWrite(in2, 0);
+    digitalWrite(in3, 1);
+    digitalWrite(in1, 1);
+  }
+
+  if (state == 'R') { // Right
+    Serial.println(state);
+    digitalWrite(in4, 1);
+    digitalWrite(in2, 0);
+    digitalWrite(in3, 0);
+    digitalWrite(in1, 1);
+  }
+
+  if (state == 'S') { // Stop
+    Serial.println(state);
+    digitalWrite(in4, 0);
+    digitalWrite(in2, 0);
+    digitalWrite(in3, 0);
+    digitalWrite(in1, 0);
+  }
+
+  if (state == 'L') { // Left
+    Serial.println(state);
+    digitalWrite(in4, 0);
+    digitalWrite(in2, 1);
+    digitalWrite(in1, 0);
+    digitalWrite(in3, 1);
+  }
+
+  if (state == 'B') { // Reverse
+    Serial.println(state);
+    digitalWrite(in3, 0);
+    digitalWrite(in1, 0);
+    digitalWrite(in4, 1);
+    digitalWrite(in2, 1);
+  }
+}

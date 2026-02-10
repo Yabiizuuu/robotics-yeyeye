@@ -17,7 +17,7 @@ void loop() {
     state = Serial.read();
   }
 
-  if (state == 'F') { // Forward
+  if (state == 'Up') { // Forward
     Serial.println(state);
     digitalWrite(in4, 0);
     digitalWrite(in2, 0);
@@ -25,7 +25,7 @@ void loop() {
     digitalWrite(in1, 1);
   }
 
-  if (state == 'R') { // Right
+  if (state == 'Right') { // Right
     Serial.println(state);
     digitalWrite(in4, 1);
     digitalWrite(in2, 0);
@@ -33,7 +33,7 @@ void loop() {
     digitalWrite(in1, 1);
   }
 
-  if (state == 'S') { // Stop
+  if (state == 'Ok') { // Stop
     Serial.println(state);
     digitalWrite(in4, 0);
     digitalWrite(in2, 0);
@@ -41,7 +41,7 @@ void loop() {
     digitalWrite(in1, 0);
   }
 
-  if (state == 'L') { // Left
+  if (state == 'Down') { // Left
     Serial.println(state);
     digitalWrite(in4, 0);
     digitalWrite(in2, 1);
@@ -49,7 +49,7 @@ void loop() {
     digitalWrite(in3, 1);
   }
 
-  if (state == 'B') { // Reverse
+  if (state == 'Down') { // Reverse
     Serial.println(state);
     digitalWrite(in3, 0);
     digitalWrite(in1, 0);

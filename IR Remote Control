@@ -1,82 +1,50 @@
 #include <IRremote.h>
-
-char command;
-int receiver_pin = 4; // Connect the output pin of IR receiver at pin 4
-IRrecv irrecv(receiver_pin);
-decode_results results;
-
-// connect motor controller pins to Arduino digital pins
-int in1 = 5;
-int in2 = 6;
-int in3 = 10;
-int in4 = 11;
-
-void setup()
-{
+ 
+int in1 = 2;
+int in2 = 3;
+int in3 = 4;
+int in4 = 5;
+ 
+int IRpin=8;
+IRrecv IR(IRpin);
+decode_results cmd;
+ 
+void setup(){
   Serial.begin(9600);
-  irrecv.enableIRIn();
-
-  // set all the motor control pins to outputs
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
+  IR.enableIRIn();
+  pinMode(in1, OUTPUT); //right wheels forward
+  pinMode(in2, OUTPUT); //right wheels backward
+  pinMode(in3, OUTPUT); //left wheels forward
+  pinMode(in4, OUTPUT); //left wheels backward
 }
-
-void loop()
-{
-  if (irrecv.decode(&results))
-  {
-    irrecv.resume();
-
-    if (results.value == 0xFF18E7) // button 2: forward
-    {
-      digitalWrite(in1, 1);
-      digitalWrite(in2, 0);
-      digitalWrite(in3, 1);
-      digitalWrite(in4, 0);
-    }
-    else if (results.value == 0xFF10EF) // button 4: turn left
-    {
-      digitalWrite(in1, 1);
-      digitalWrite(in2, 0);
-      digitalWrite(in3, 0);
-      digitalWrite(in4, 0);
-    }
-    else if (results.value == 0xFF30CF) // button 1: rotate left
-    {
-      digitalWrite(in1, 1);
-      digitalWrite(in2, 0);
-      digitalWrite(in3, 0);
-      digitalWrite(in4, 1);
-    }
-    else if (results.value == 0xFF5AA5) // button 6: turn right
-    {
-      digitalWrite(in1, 0);
-      digitalWrite(in2, 0);
-      digitalWrite(in3, 1);
-      digitalWrite(in4, 0);
-    }
-    else if (results.value == 0xFF7A85) // button 3: rotate right
-    {
-      digitalWrite(in1, 0);
-      digitalWrite(in2, 1);
-      digitalWrite(in3, 1);
-      digitalWrite(in4, 0);
-    }
-    else if (results.value == 0xFF4AB5) // button 8: backward
-    {
-      digitalWrite(in1, 0);
-      digitalWrite(in2, 1);
-      digitalWrite(in3, 0);
-      digitalWrite(in4, 1);
-    }
-    else if (results.value == 0xFF38C7) // button 5: stop
-    {
-      digitalWrite(in1, 0);
-      digitalWrite(in2, 0);
-      digitalWrite(in3, 0);
-      digitalWrite(in4, 0);
-    }
+ 
+void loop(){
+  while(IR.decode(&cmd)==0){}
+  Serial.println(cmd.value,HEX);
+  IR.resume();
+  if(cmd.value==0xFF18E7){ //forward
+    digitalWrite(in1, HIGH);
+    digitalWrite(in3, HIGH);
+    delay(500);
   }
-}
+  if(cmd.value==0xFF4AB5){ //reverse
+    digitalWrite(in2, HIGH);
+    digitalWrite(in4, HIGH);
+    delay(500);
+  }
+  if(cmd.value==0xFF10EF){ //left-forward
+    digitalWrite(in3, HIGH);
+    delay(500);
+  }
+  if(cmd.value==0xFF5AA5){ //right-forward
+    digitalWrite(in1, HIGH);
+    delay(500);
+  }
+  if(cmd.value==0xFF38C7){ //stop
+    digitalWrite(in1, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in2, LOW);
+    digitalWrite(in4, LOW);
+    delay(500);
+  }
+  }

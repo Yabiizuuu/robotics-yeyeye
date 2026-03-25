@@ -1,0 +1,111 @@
+#include <IRremote.hpp>
+#include <IRremote.h>
+
+int in1 = 5; // digital pin 5
+int in2 = 4; // digital pin 4
+int in3 = 3; // digital pin 3
+int in4 = 2; // digital pin 2
+int ENA = 10;
+int ENB = 11;
+
+int IRpin=8; // digital pin 8
+IRrecv IR(IRpin);
+decode_results cmd;
+
+unsigned long lastSignalTime = 0;
+unsigned long timeout = 200;
+unsigned long lastCommand = 0;
+
+void stopMotors() {
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
+}
+
+void setup() {
+  Serial.begin(9600);
+  IR.enableIRIn();
+
+  pinMode(in1, OUTPUT); //right wheels forward
+  pinMode(in2, OUTPUT); //right wheels backward
+  pinMode(in3, OUTPUT); //left wheels forward
+  pinMode(in4, OUTPUT); //left wheels backward
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+}
+
+void loop() {
+
+  if (IR.decode(&cmd)) {
+
+    unsigned long value = cmd.value;
+
+    // this handles if the button is still being held meaning it will keep going
+    if (value == 0xFFFFFFFF) {
+      value = lastCommand;
+    } else {
+      lastCommand = value;
+    }
+
+    Serial.println(value, HEX);
+    lastSignalTime = millis();
+
+    // FORWARD
+    if (value == 0xFF18E7) { //forward
+      analogWrite(ENA, 255);
+      analogWrite(ENB, 255);
+      digitalWrite(in2, LOW);
+      digitalWrite(in4, HIGH);  //reversed
+      digitalWrite(in1, HIGH);
+      digitalWrite(in3, LOW);  //reversed
+    }
+
+    // REVERSE
+    else if (value == 0xFF4AB5) { //reverse
+      analogWrite(ENA, 255);
+      analogWrite(ENB, 255);
+      digitalWrite(in1, LOW);
+      digitalWrite(in3, HIGH);
+      digitalWrite(in2, HIGH);
+      digitalWrite(in4, LOW);
+    }
+
+    // LEFT
+    else if (value == 0xFF10EF) { //left-forward
+      analogWrite(ENA, 255);
+      analogWrite(ENB, 255);
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, LOW);
+      digitalWrite(in4, HIGH);
+      digitalWrite(in3, LOW);
+    }
+
+    // RIGHT
+    else if (value == 0xFF5AA5) { //right-forward
+      analogWrite(ENA, 255);
+      analogWrite(ENB, 255);
+      digitalWrite(in2, LOW);
+      digitalWrite(in3, LOW);
+      digitalWrite(in4, LOW);
+      digitalWrite(in1, HIGH);
+    }
+   else if (value==0xFF38C7){ //stop
+      analogWrite(ENA, 0);
+      analogWrite(ENB, 0);
+      digitalWrite(in2, LOW);
+      digitalWrite(in3, LOW);
+      digitalWrite(in4, LOW);
+      digitalWrite(in1, LOW);
+  }
+
+    IR.resume();
+  }
+
+  // If there is no signal when perssing the buttons it stops instantly
+  if (millis() - lastSignalTime > timeout) {
+    stopMotors();
+  }
+}

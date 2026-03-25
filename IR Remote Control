@@ -1,11 +1,15 @@
+#include <IRremote.hpp>
+
 #include <IRremote.h>
  
-int in1 = 2;
-int in2 = 3;
-int in3 = 4;
-int in4 = 5;
+int in1 = 5; // digital pin 5
+int in2 = 4; // digital pin 4
+int in3 = 3; // digital pin 3
+int in4 = 2; // digital pin 2
+int ENA = 10;
+int ENB = 11;
  
-int IRpin=8;
+int IRpin=8; // digital pin 8
 IRrecv IR(IRpin);
 decode_results cmd;
  
@@ -16,6 +20,8 @@ void setup(){
   pinMode(in2, OUTPUT); //right wheels backward
   pinMode(in3, OUTPUT); //left wheels forward
   pinMode(in4, OUTPUT); //left wheels backward
+  pinMode(ENA,OUTPUT);
+  pinMode(ENB, OUTPUT);
 }
  
 void loop(){
@@ -23,24 +29,44 @@ void loop(){
   Serial.println(cmd.value,HEX);
   IR.resume();
   if(cmd.value==0xFF18E7){ //forward
-    digitalWrite(in1, HIGH);
-    digitalWrite(in3, HIGH);
+  analogWrite(ENA, 255);
+    analogWrite(ENB, 255);
+  digitalWrite(in2, LOW);
+  digitalWrite(in4, HIGH);   // reversed
+  digitalWrite(in1, HIGH);
+  digitalWrite(in3, LOW);    // reversed
     delay(500);
   }
   if(cmd.value==0xFF4AB5){ //reverse
+  analogWrite(ENA, 255);
+    analogWrite(ENB, 255);
+    digitalWrite(in1, LOW);
+    digitalWrite(in3, HIGH);
     digitalWrite(in2, HIGH);
-    digitalWrite(in4, HIGH);
+    digitalWrite(in4, LOW);
     delay(500);
   }
   if(cmd.value==0xFF10EF){ //left-forward
-    digitalWrite(in3, HIGH);
+  analogWrite(ENA, 255);
+    analogWrite(ENB, 255);
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, LOW);
+    digitalWrite(in4, HIGH);
+    digitalWrite(in3, LOW);
     delay(500);
   }
   if(cmd.value==0xFF5AA5){ //right-forward
+  analogWrite(ENA, 255);
+    analogWrite(ENB, 255);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
     digitalWrite(in1, HIGH);
     delay(500);
   }
   if(cmd.value==0xFF38C7){ //stop
+  analogWrite(ENA, 0);
+    analogWrite(ENB, 0);
     digitalWrite(in1, LOW);
     digitalWrite(in3, LOW);
     digitalWrite(in2, LOW);
